@@ -2,6 +2,11 @@
 
 ## Requirements
 
+### Version 2.0
+- iOS 13.0+
+- Xcode 11.4+
+- Swift 5.2+
+
 ### Version 1.0
 - iOS 11.0+
 - Xcode 10.2+
@@ -23,31 +28,35 @@ class ViewController: UIViewController {
 var thrimer: Thrimer?
 ```
 
-### Express setup
+### Express setup with Delegation
 
-Initialize your property, delegate and start automatically with optional value, a non-repeating timer that runs for 10 seconds.
+Initialize your property, delegate and start automatically with optional value, creating a non-repeating timer that runs for 10 seconds.
 ```swift
 thrimer = Thrimer(interval: 10.0, delegate: self, repeats: false)
 ```
 
-### Standard timer
+### Express setup with Combine Publisher
 
-Initialize your property, the following creates a non-repeating timer that runs for 10 seconds.
+Initialize your property and start automatically, creating a non-repeating timer that runs for 10 seconds.
 ```swift
 thrimer = Thrimer(interval: 10.0, repeats: false)
 ```
+
+While you are not obliged to configure the delegate when observing the publisher, `Thrimer` will still call the delegate and send events to it should it also be configured.
+
+### Standard timer
+
+Initialize your property, the following creates a non-repeating timer that runs for 10 seconds and does not auto start.
+```swift
+thrimer = Thrimer(interval: 10.0, repeats: false, autostart: false)
+```
+
+### When using delegation
 
 Next, set the delegate:
 ```swift
 thrimer?.delegate = self
 ```
-
-And start the timer when you are ready:
-```swift
-thrimer?.start()
-```
-
-### Delegate
 
 To receive updates when the timer completes, you must comform to the ThrimerDelegate:
 ```swift
@@ -58,12 +67,26 @@ extension ViewController: ThrimerDelegate {
 }
 ```
 
+### When using publisher
+
+You can assign a sink to the publisher for `Thrimer` events.
+```swift
+let cancellable = thrimer.didCompleteTimer.sink { _ in
+    // Perform action
+}
+```
+
+And start the timer when you are ready:
+```swift
+thrimer?.start()
+```
+
 ### Pause timer
 
 This creates a non-repeating timer with a 10 second duration.
 
 ```swift
-let thrimer = Thrimer(interval: 10.0, repeats: false)
+let thrimer = Thrimer(interval: 10.0, repeats: false, autostart: false)
 thrimer.delegate = self
 thrimer.start()
 ```
@@ -93,13 +116,9 @@ Finally, you can resume it:
 thrimer.resume()
 ```
 
-## Changelog
-
-[Changelog](https://github.com/seanmcneil/Thrimer/blob/master/CHANGELOG.md) | See the changes introduced in each version.
-
 ## Author
 
-seanmcneil, s@m.com
+Sean McNeil
 
 ## License
 

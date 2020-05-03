@@ -5,8 +5,8 @@ import PackageDescription
 
 let package = Package(
     name: "Thrimer",
-    platforms: [.iOS(.v11),
-                .macOS(.v10_12)],
+    platforms: [.iOS(.v13),
+                .macOS(.v10_15)],
     products: [
         .library(
             name: "Thrimer",

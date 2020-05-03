@@ -1,5 +1,5 @@
 import XCTest
-import Thrimer
+import Combine
 
 @testable import Thrimer
 
@@ -17,6 +17,60 @@ class ThrimerTests: XCTestCase {
         
         waitForExpectations(timeout: 2.0) { error in
             XCTAssertNil(error)
+        }
+    }
+    
+    func testStartTimerPublisher() {
+        let thrimer = Thrimer(interval: 3.0)
+        let expect = expectation(description: "test")
+        let startTime = Date()
+        let cancellable = thrimer.didCompleteTimer.sink { _ in
+            expect.fulfill()
+        }
+        thrimer.start()
+        
+        waitForExpectations(timeout: 4.0) { error in
+            XCTAssertNil(error)
+            XCTAssertEqual(Date().timeIntervalSince(startTime), 3.0, accuracy: 0.03, "nice")
+            cancellable.cancel()
+        }
+    }
+    
+    func testStartTimerPublisherRepeats() {
+        let thrimer = Thrimer(interval: 2.0, repeats: true)
+        let expect = expectation(description: "test")
+        let startTime = Date()
+        var hasReceived = false
+        let cancellable = thrimer.didCompleteTimer.sink { _ in
+            if hasReceived {
+                expect.fulfill()
+            } else {
+                hasReceived = true
+            }
+        }
+        thrimer.start()
+        
+        waitForExpectations(timeout: 5.0) { error in
+            XCTAssertNil(error)
+            XCTAssertEqual(Date().timeIntervalSince(startTime), 4.0, accuracy: 0.03, "nice")
+            cancellable.cancel()
+        }
+    }
+    
+    func testStartTimerPublisherNoRepeats() {
+        let thrimer = Thrimer(interval: 2.0, repeats: false)
+        let expect = expectation(description: "test")
+        let startTime = Date()
+        let cancellable = thrimer.didCompleteTimer.sink { _ in
+            expect.fulfill()
+        }
+        thrimer.start()
+        
+        waitForExpectations(timeout: 2.5) { error in
+            XCTAssertNil(error)
+            XCTAssertEqual(Date().timeIntervalSince(startTime), 2.0, accuracy: 0.03, "nice")
+            XCTAssertFalse(thrimer.isRunning)
+            cancellable.cancel()
         }
     }
     
@@ -44,18 +98,18 @@ class ThrimerTests: XCTestCase {
     
     func testPauseAndResume() {
         let thrimer = Thrimer(interval: 5.0, repeats: false)
-        thrimer.start()
         
         XCTAssertTrue(thrimer.isRunning)
         sleep(1)
         thrimer.pause()
         XCTAssertTrue(thrimer.isPaused)
         sleep(1)
-        XCTAssertEqual(Double(thrimer.timeRemaining ?? 0.0), 2.0, accuracy: 0.03, "nice")
+        XCTAssertNil(thrimer.timeRemaining)
         thrimer.resume()
+        XCTAssertNotNil(thrimer.timeRemaining)
         XCTAssertTrue(thrimer.isRunning)
     }
-    
+
     func testCompletion() {
         isCompletedExpectation = expectation(description: "test")
         let thrimer = Thrimer(interval: 2.0,
