@@ -45,10 +45,10 @@ public class Thrimer {
         return nil
     }
     
-    /// Custom initializer
+    /// Initialize Thrimer object for use with Combine, or to provide a delegate to later
     ///
     /// - Parameters:
-    ///   - interval: Duration of timer
+    ///   - interval: Duration of timer in seconds
     ///   - repeats: Should timer repeat. Default value is false
     ///   - autostart: Should timer start immediately. Default value is true
     public init(interval: TimeInterval,
@@ -65,10 +65,10 @@ public class Thrimer {
     /// Initialize Thrimer object with a delegate
     ///
     /// - Parameters:
-    ///   - interval: Duration of timer
+    ///   - interval: Duration of timer in seconds
     ///   - delegate: Delegate
-    ///   - autostart: Should timer start immediately. Default value is true
     ///   - repeats: Should timer repeat. Default value is false
+    ///   - autostart: Should timer start immediately. Default value is true
     public init(interval: TimeInterval,
                 delegate: ThrimerDelegate,
                 repeats: Bool = false,
@@ -91,10 +91,9 @@ public class Thrimer {
         // Ensure there is no existing timer running
         cancel()
         let cancellableSink = Timer.publish(every: interval,
-                                            on: RunLoop.main,
+                                            on: .main,
                                             in: .default)
             .autoconnect()
-            .removeDuplicates()
             .sink { [weak self] receivedTimeStamp in
                 self?.handleTimerCompletion()
             }
@@ -107,8 +106,8 @@ public class Thrimer {
     public func pause() {
         if isRunning,
             let startTime = startTime {
-            pausedInterval = Date().timeIntervalSince(startTime)
             cancel()
+            pausedInterval = Date().timeIntervalSince(startTime)
         }
     }
     
@@ -135,6 +134,8 @@ public class Thrimer {
             cancellable.cancel()
         }
         cancellables.removeAll()
+        // Resets time variables
         startTime = nil
+        pausedInterval = nil
     }
 }

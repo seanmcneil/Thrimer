@@ -31,7 +31,7 @@ class ThrimerTests: XCTestCase {
         
         waitForExpectations(timeout: 4.0) { error in
             XCTAssertNil(error)
-            XCTAssertEqual(Date().timeIntervalSince(startTime), 3.0, accuracy: 0.03, "nice")
+            XCTAssertEqual(Date().timeIntervalSince(startTime), 3.0, accuracy: 0.03)
             cancellable.cancel()
         }
     }
@@ -52,7 +52,7 @@ class ThrimerTests: XCTestCase {
         
         waitForExpectations(timeout: 5.0) { error in
             XCTAssertNil(error)
-            XCTAssertEqual(Date().timeIntervalSince(startTime), 4.0, accuracy: 0.03, "nice")
+            XCTAssertEqual(Date().timeIntervalSince(startTime), 4.0, accuracy: 0.03)
             cancellable.cancel()
         }
     }
@@ -68,7 +68,7 @@ class ThrimerTests: XCTestCase {
         
         waitForExpectations(timeout: 2.5) { error in
             XCTAssertNil(error)
-            XCTAssertEqual(Date().timeIntervalSince(startTime), 2.0, accuracy: 0.03, "nice")
+            XCTAssertEqual(Date().timeIntervalSince(startTime), 2.0, accuracy: 0.03)
             XCTAssertFalse(thrimer.isRunning)
             cancellable.cancel()
         }
@@ -137,6 +137,24 @@ class ThrimerTests: XCTestCase {
         waitForExpectations(timeout: 3.0) { error in
             XCTAssertNil(error)
             XCTAssertNil(viewModel)
+        }
+    }
+    
+    func testTimerRestart() {
+        let expect = expectation(description: "test")
+        let startTime = Date()
+        let thrimer = Thrimer(interval: 2.0)
+        let cancelleable = thrimer.didCompleteTimer.sink { _ in
+            expect.fulfill()
+        }
+        sleep(1)
+        thrimer.start()
+        
+        waitForExpectations(timeout: 4.0) { error in
+            XCTAssertNil(error)
+            let timeElapsed = Date().timeIntervalSince(startTime)
+            XCTAssertGreaterThan(timeElapsed, 3.0)
+            cancelleable.cancel()
         }
     }
 }

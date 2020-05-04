@@ -2,7 +2,7 @@
 
 ## Requirements
 
-### Version 2.0
+### Version 2.1
 - iOS 13.0+
 - Xcode 11.4+
 - Swift 5.2+
