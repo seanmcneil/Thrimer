@@ -39,7 +39,9 @@ public class Thrimer {
     // Computed property indicates time remaining. Will be nil if no timer is active.
     public var timeRemaining: TimeInterval? {
         if let startTime = startTime {
-            return Date().timeIntervalSince(startTime)
+            let interval = Date().timeIntervalSince(startTime)
+            
+            return round(interval * 1000) / 1000
         }
         
         return nil
@@ -101,6 +103,11 @@ public class Thrimer {
         startTime = Date()
     }
     
+    /// Stops a timer
+    public func stop() {
+        didCompleteTimerPublisher.send(completion: Subscribers.Completion<Never>.finished)
+        cancel()
+    }
     
     /// Pauses active timer
     public func pause() {
@@ -134,7 +141,11 @@ public class Thrimer {
             cancellable.cancel()
         }
         cancellables.removeAll()
-        // Resets time variables
+        reset()
+    }
+    
+    /// Resets time variables
+    private func reset() {
         startTime = nil
         pausedInterval = nil
     }

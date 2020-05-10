@@ -2,7 +2,7 @@
 
 ## Requirements
 
-### Version 2.1
+### Version 2.2
 - iOS 13.0+
 - Xcode 11.4+
 - Swift 5.2+
@@ -115,6 +115,16 @@ Finally, you can resume it:
 ```swift
 thrimer.resume()
 ```
+
+### Stop timer
+
+If you need to stop the timer:
+
+```swift
+thrimer.stop()
+```
+
+This will reset all values associated with it and close the `Publisher` associated with it.
 
 ## Author
 

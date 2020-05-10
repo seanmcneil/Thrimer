@@ -144,7 +144,7 @@ class ThrimerTests: XCTestCase {
         let expect = expectation(description: "test")
         let startTime = Date()
         let thrimer = Thrimer(interval: 2.0)
-        let cancelleable = thrimer.didCompleteTimer.sink { _ in
+        let cancellable = thrimer.didCompleteTimer.sink { _ in
             expect.fulfill()
         }
         sleep(1)
@@ -154,7 +154,27 @@ class ThrimerTests: XCTestCase {
             XCTAssertNil(error)
             let timeElapsed = Date().timeIntervalSince(startTime)
             XCTAssertGreaterThan(timeElapsed, 3.0)
-            cancelleable.cancel()
+            cancellable.cancel()
+        }
+    }
+    
+    func testTimerStop() {
+        let expect = expectation(description: "test")
+        let thrimer = Thrimer(interval: 2.0)
+        let cancellable = thrimer.didCompleteTimer.sink(receiveCompletion: { subscribers in
+            switch subscribers {
+            case .failure(_):
+                XCTFail()
+            case .finished:
+                expect.fulfill()
+            }
+        }) { _ in }
+        sleep(1)
+        thrimer.stop()
+        
+        waitForExpectations(timeout: 4.0) { error in
+            XCTAssertNil(error)
+            cancellable.cancel()
         }
     }
 }
