@@ -126,6 +126,12 @@ thrimer.stop()
 
 This will reset all values associated with it and close the `Publisher` associated with it.
 
+### Support
+
+If you find an issue or can think of an improvement, issues and pull requests are always welcome. 
+
+For pull requests, please be sure to ensure your work is covered with existing or new unit tests.
+
 ## Author
 
 Sean McNeil
